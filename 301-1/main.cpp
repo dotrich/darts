@@ -1,7 +1,7 @@
 #include <iostream>
 #include <conio.h>
 #include <windows.h>
-#include <map>
+//#include <map>
 #include "darts.h"
 
 using std::cout;
@@ -78,6 +78,44 @@ void updateSettings()
 	drawString(29, 15, std::to_string((long long unsigned)dartsGame.getNoPlayers() ));
 	drawString(29, 16, std::to_string((long long unsigned)dartsGame.getScore() ));
 	drawString(29, 17, std::to_string((long long unsigned)dartsGame.getNoGames() ));
+}
+
+int64_t intLength(int64_t var)
+{
+	uint16_t len = 0;
+
+	while (var != 0) // finds length of var
+	{
+		var /= 10;
+		len++;
+	}
+
+	return len;
+}
+
+uint32_t intModifier(uint16_t input, uint16_t xPos, uint32_t var)
+{
+	uint32_t incNo = 0;
+	uint32_t decNo = 0;
+	uint32_t modNo = 0;
+	uint16_t len = intLength(var);
+
+	for (uint16_t x = 48; x <= 57; x++) // converts ascii 48-57 input into equivelent decimal 0-9
+	{
+		if (x == input)
+		{
+			incNo = x - 48; // gets increment digit
+			break;
+		}		
+	}
+
+	modNo = pow((float)10, len - xPos); // division number for modulo
+	decNo = (var % modNo) / pow((float)10, len - (xPos + 1)); // gets decrement digit
+
+	incNo = incNo * (modNo / 10); // new value for swapping in
+	decNo = decNo * (modNo / 10); // old value for swapping out
+	
+	return (var - decNo) + incNo; // swaps
 }
 
 void scrnInit(uint16_t scrn) // changes screen and sets up UI
@@ -173,16 +211,53 @@ void scrnMain() // main menu (which screen, max options)
 
 void scrnSettings() // game settings prior to playing
 {
+	uint32_t curInt = 0;
+	uint32_t temp = 0;
+
 	if (_kbhit())
 	{
 		input = toupper(getch());
 
+		switch (yPos)
+		{
+			case Y_POS_DEFAULT + 1 :
+				curInt = dartsGame.getNoPlayers();
+				break;
+			case Y_POS_DEFAULT + 2 :
+				curInt = dartsGame.getScore();
+				break;
+			case Y_POS_DEFAULT + 3 :
+				curInt = dartsGame.getNoGames();
+				break;
+		}
+
+		if (input == 72 || input == 80) // resets x pos after moving up/down
+			xPos = X_POS_DEFAULT;
+
+		if (input >= 48 && input <= 57)
+		{
+			if ((xPos - 29) + 1 > intLength(curInt)) 
+			{
+				// WIP: to add/delete digits
+			} 
+			else if (input == 48 && xPos - 29 == 0) {} // stops zero being added to front
+			else
+			{
+				temp = intModifier(input, xPos - 29, curInt);
+
+				if (curInt == dartsGame.getNoPlayers())
+					dartsGame.setNoPlayers(temp);
+				else if (curInt == dartsGame.getScore())
+					dartsGame.setScore(temp);
+				else if (curInt == dartsGame.getNoGames())
+					dartsGame.setNoGames(temp);
+
+				updateSettings();
+			}
+		}
+
 		switch (input)
 		{
-			case 72 || 80 : // up or down
-				xPos = X_POS_DEFAULT;
-				cout << "HELP";
-				break;
 			case 72 : // up
 				yPos--;
 				break;
