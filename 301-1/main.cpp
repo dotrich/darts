@@ -1,8 +1,9 @@
 #include <iostream>
 #include <conio.h>
 #include <windows.h>
-//#include <map>
 #include "darts.h"
+
+#include <stdio.h>
 
 using std::cout;
 using std::cin;
@@ -22,9 +23,12 @@ CONSOLE_CURSOR_INFO curInfo;
 HANDLE hConsole;
 COORD cursorPos;
 
+// unused code
+//#include <map>
 //std::map<char, uint16_t> POS_DEFAULT;
 //POS_DEFAULT[axis] = NULL;
 
+// function pointer array
 //typedef void (*FuncPointer)(uint16_t, uint16_t);
 //
 //FuncPointer scrnArray[4] = {NULL};
@@ -32,12 +36,13 @@ COORD cursorPos;
 
 void setGraphics()
 {
-	hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE); // used to reference console
 
-	GetConsoleCursorInfo(hConsole, &curInfo);
+	// set cursor info, full size, hidden by default
+	GetConsoleCursorInfo(hConsole, &curInfo); // need to retrieve cursor info first
 	curInfo.dwSize = 100;
 	curInfo.bVisible = 0;
-	SetConsoleCursorInfo(hConsole, &curInfo);
+	SetConsoleCursorInfo(hConsole, &curInfo); // sets once finished
 }
 
 void drawString(uint16_t x,uint16_t y, string out)
@@ -58,9 +63,9 @@ void clampCurDraw(char axis, uint16_t no, uint16_t max)
 	else if (toupper(axis) == 'Y')
 		yPos = clamp(yPos, Y_POS_DEFAULT, Y_POS_DEFAULT + max);
 		
-	if (toupper(axis) == 'X') // moves cursor after clamp
+	if (toupper(axis) == 'X') // moves x cursor after clamp
 		drawString(xPos, yPos, "");
-	else if (toupper(axis) == 'Y') // removes old and adds new cursor
+	else if (toupper(axis) == 'Y') // removes old and adds new y cursor
 	{
 		for (int x = 0; x < max+1; x++) // removes old cursor
 		{
@@ -73,7 +78,7 @@ void clampCurDraw(char axis, uint16_t no, uint16_t max)
 	}
 }
 
-void updateSettings()
+void updateSettings() // refreshes settings on game settings screen
 {
 	drawString(29, 15, std::to_string((long long unsigned)dartsGame.getNoPlayers() ));
 	drawString(29, 16, std::to_string((long long unsigned)dartsGame.getScore() ));
@@ -153,7 +158,8 @@ void scrnInit(uint16_t scrn) // changes screen and sets up UI
 					"    [1] - Start Game" << "\n"
 					"     2  - No of Players    [           ]" << "\n"
 					"     3  - Starting Score   [           ]" << "\n"
-					"     4  - No of Games      [           ]" << "\n";
+					"     4  - No of Games      [           ]" << "\n"
+					"     5  - Main Menu" << "\n";
 
 			updateSettings();
 			drawString(X_POS_DEFAULT, Y_POS_DEFAULT, "");
@@ -173,7 +179,7 @@ void scrnInit(uint16_t scrn) // changes screen and sets up UI
 	
 }
 
-void scrnMain() // main menu (which screen, max options)
+void scrnMain() // main screen
 {
 	if (_kbhit())
 	{
@@ -209,8 +215,39 @@ void scrnMain() // main menu (which screen, max options)
 	}
 }
 
+
+
+
+
+
+
+
+LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    switch(msg)
+    {
+        case WM_KEYUP:
+			cout << "help" << "\n";
+			break;
+        default:
+            return DefWindowProc(hwnd, msg, wParam, lParam);
+    }
+    return 0;
+}
+
+
+
+
+
+
+
+
+
 void scrnSettings() // game settings prior to playing
 {
+	const uint16_t xMax = 8;
+	const uint16_t yMax = 4;
+
 	uint32_t curInt = 0;
 	uint32_t temp = 0;
 
@@ -218,7 +255,7 @@ void scrnSettings() // game settings prior to playing
 	{
 		input = toupper(getch());
 
-		switch (yPos)
+		switch (yPos) // gets current y pos setting
 		{
 			case Y_POS_DEFAULT + 1 :
 				curInt = dartsGame.getNoPlayers();
@@ -234,7 +271,7 @@ void scrnSettings() // game settings prior to playing
 		if (input == 72 || input == 80) // resets x pos after moving up/down
 			xPos = X_POS_DEFAULT;
 
-		if (input >= 48 && input <= 57)
+		if (input >= 48 && input <= 57) // main keys 0-9
 		{
 			if ((xPos - 29) + 1 > intLength(curInt)) 
 			{
@@ -245,6 +282,7 @@ void scrnSettings() // game settings prior to playing
 			{
 				temp = intModifier(input, xPos - 29, curInt);
 
+				// commits updated setting
 				if (curInt == dartsGame.getNoPlayers())
 					dartsGame.setNoPlayers(temp);
 				else if (curInt == dartsGame.getScore())
@@ -270,38 +308,53 @@ void scrnSettings() // game settings prior to playing
 			case 77 : // right
 				xPos++;
 				break;
-			case 13 : // return				
-				if (GetAsyncKeyState(13) && (yPos == Y_POS_DEFAULT))
-				{	
-					//WIP									
-					yPos = Y_POS_DEFAULT;
-					return;
-				}
+			//case 13 : // return
+			//	break;
+			case WM_KEYUP :
+				//if (wParam == 13)
+				//	swprintf_s(msg, L"WM_KEYUP: 0x%x\n", wParam);
+				//	OutputDebugString(msg);
+				//else
+				//	break;
 
-				break;
+				//if (WM_KEYUP)
+				//{
+				//	switch (yPos)
+				//	{	
+				//		case Y_POS_DEFAULT :
+				//			// WIP: to start game
+				//			return;
+				//		case Y_POS_DEFAULT + yMax : ;
+				//			// main menu, falls down
+				//	}
+				//}
+				//else
+				//	break;
 			case 27 : // escape
+				// reset cursor and move screen
 				GetConsoleCursorInfo(hConsole, &curInfo);
-				curInfo.bVisible = 0;
+				curInfo.bVisible = 0; // hide cursor
 				SetConsoleCursorInfo(hConsole, &curInfo);
 
-				scrnInit(1);
+				scrnInit(1); // main menu
 				xPos = X_POS_DEFAULT;
 				yPos = Y_POS_DEFAULT;
 				return;
 		}
 
+		// hides cursor when on start game option
 		GetConsoleCursorInfo(hConsole, &curInfo);
 
-		if (yPos > Y_POS_DEFAULT)			
+		if (yPos > Y_POS_DEFAULT && yPos < Y_POS_DEFAULT + yMax)
 			curInfo.bVisible = 1;
 		else
 			curInfo.bVisible = 0;			
 
 		SetConsoleCursorInfo(hConsole, &curInfo);
 
-		drawString(X_POS_DEFAULT, yPos, "");
-		clampCurDraw('y', yPos, 3);
-		clampCurDraw('x', xPos, 8);
+		// clamps x and y positions
+		clampCurDraw('y', yPos, yMax);
+		clampCurDraw('x', xPos, xMax);	
 	}
 }
 
