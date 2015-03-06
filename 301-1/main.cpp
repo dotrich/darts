@@ -4,6 +4,7 @@
 #include "darts.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 using std::cout;
 using std::cin;
@@ -33,6 +34,74 @@ COORD cursorPos;
 //
 //FuncPointer scrnArray[4] = {NULL};
 //scrnArray[0] = &scrnMenu;
+
+
+
+
+
+DWORD g_main_tid = 0;
+HHOOK g_kb_hook = 0;
+
+BOOL CALLBACK con_handler(DWORD)
+{
+	PostThreadMessage(g_main_tid, WM_QUIT, 0, 0);
+	return TRUE;
+};
+
+LRESULT CALLBACK kb_proc(int code, WPARAM w, LPARAM l)
+{
+	PKBDLLHOOKSTRUCT p = (PKBDLLHOOKSTRUCT)l;
+	const char *info = NULL;
+
+	if (w == WM_KEYUP)
+	{
+		if (l == 13)
+			cout << WH_KEYBOARD_LL << "\n";
+		//printf ("%s - vkCode [%04x], scanCode [%04x]\n", info, p->vkCode, p->scanCode);
+	}
+
+	// always call next hook
+	return CallNextHookEx(g_kb_hook, code, w, l);
+};
+ 
+int main (void)
+{
+	g_main_tid = GetCurrentThreadId ();
+	SetConsoleCtrlHandler(&con_handler, TRUE);
+	g_kb_hook = SetWindowsHookEx(WH_KEYBOARD_LL, 
+					&kb_proc,
+					GetModuleHandle (NULL), // cannot be NULL, otherwise it will fail
+					0);
+
+	if (g_kb_hook == NULL)
+	{
+		fprintf (stderr, "SetWindowsHookEx failed with error %d\n", ::GetLastError ());
+		return 0;
+	};
+       
+	MSG msg;
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	};
+	UnhookWindowsHookEx(g_kb_hook);
+	return 0;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 void setGraphics()
 {
@@ -214,34 +283,6 @@ void scrnMain() // main screen
 		clampCurDraw('y', yPos, 2);
 	}
 }
-
-
-
-
-
-
-
-
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    switch(msg)
-    {
-        case WM_KEYUP:
-			cout << "help" << "\n";
-			break;
-        default:
-            return DefWindowProc(hwnd, msg, wParam, lParam);
-    }
-    return 0;
-}
-
-
-
-
-
-
-
-
 
 void scrnSettings() // game settings prior to playing
 {
