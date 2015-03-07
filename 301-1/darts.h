@@ -1,10 +1,9 @@
 #ifndef _DARTS_H
 #define _DARTS_H
 
-#include <string>
 #include <cstdint>
 
-int clamp(uint32_t cur, uint32_t min, uint32_t max);
+uint32_t clamp(uint32_t cur, uint32_t min, uint32_t max);
 
 class Darts
 {
@@ -16,23 +15,21 @@ private:
 
 	uint32_t* thrCount;
 	
-	int single(uint8_t); // non-bullseye darts
-	int bull(uint8_t); // bullseye darts	
-	int game(uint8_t); // handles one game at a time
+	uint16_t single(uint16_t); // non-bullseye darts
+	uint16_t bull(uint16_t); // bullseye darts	
+	uint16_t game(uint16_t); // handles one game at a time
 
 public:
-	int getScore();
-	int getNoPlayers();
-	int getNoGames();
-
-	std::string* plyrName[];
+	uint32_t getScore();
+	uint16_t getNoPlayers();
+	uint32_t getNoGames();
 	
 	Darts::Darts() :
 		score_(101),
 		plyrNo_(1),
 		gameNo_(1000),
 
-		thrCount(NULL)
+		thrCount(nullptr)
 	{	
 	}
 

@@ -1,25 +1,27 @@
 #include <iostream>
 #include <ctime>
+
 #include "darts.h"
+
 using std::cout;
 
 Darts::~Darts()
 {
 	//delete [] thrCount;
-	//thrCount = NULL;
+	//thrCount = nullptr;
 }
 
-int Darts::getScore()
+uint32_t Darts::getScore()
 {
 	return score_;
 }
 
-int Darts::getNoPlayers()
+uint16_t Darts::getNoPlayers()
 {
 	return plyrNo_;
 }
 
-int Darts::getNoGames()
+uint32_t Darts::getNoGames()
 {
 	return gameNo_;
 }
@@ -39,7 +41,7 @@ void Darts::setNoGames(uint32_t g)
 	gameNo_ = g;
 }
 
-int clamp(uint32_t cur, uint32_t min, uint32_t max)
+uint32_t clamp(uint32_t cur, uint32_t min, uint32_t max)
 {
 	cur = cur < min ? min : cur;
 	cur = cur > max ? max : cur;
@@ -47,11 +49,11 @@ int clamp(uint32_t cur, uint32_t min, uint32_t max)
 	return cur;
 }
 
-int Darts::single(uint8_t p) // non-bullseye darts
+uint16_t Darts::single(uint16_t p) // non-bullseye darts
 {
-	int randNo = rand()%100;
-	int item = 0;
-	int board[22] = {20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5, 20, 1};
+	uint16_t randNo = rand()%100;
+	uint16_t item = 0;
+	uint16_t board[22] = {20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5, 20, 1};
 
 	if (randNo<80) // 80% chance to hit target
 		return p;
@@ -69,7 +71,7 @@ int Darts::single(uint8_t p) // non-bullseye darts
 	}
 }
 
-int Darts::bull(uint8_t p) // bullseye darts
+uint16_t Darts::bull(uint16_t p) // bullseye darts
 {
 	if (rand()%100 < p)
 		return 50;
@@ -77,12 +79,12 @@ int Darts::bull(uint8_t p) // bullseye darts
 		return 1 + rand()%20;
 }
 
-int Darts::game(uint8_t p) // handles one game
+uint16_t Darts::game(uint16_t p) // handles one game
 {
 	state style = FAST;
-	int tmpScore = score_;
-	int darts = 0;
-	int temp = 0;
+	uint32_t tmpScore = score_;
+	uint16_t darts = 0;
+	uint32_t temp = 0;
 
 	do 
 	{
@@ -157,12 +159,12 @@ void Darts::playGame()
 	for (uint32_t x = 0; x <= max; x++)
 		thrCount[x] = 0;
 
-	int totDarts = 0;
-	int darts = 0;
-	int trash = 0;
+	uint32_t totDarts = 0;
+	uint16_t darts = 0;
+	uint16_t trash = 0;
 
-	int plyrNo = 1;
-	std::string plyrName = "Unknown";
+	uint16_t plyrNo = 1;
+	char *plyrName = "Unknown";
 
 	srand( (uint32_t)time(NULL) );
 	trash = rand()%100; // throws away first random value for better divergence
@@ -171,7 +173,7 @@ void Darts::playGame()
 			<< "No of Games:     " << gameNo_ << "\n"
 			<< "Starting Score:  " << score_ << "\n";
 			 
-	for (int x = 0; x < plyrNo_; x++)
+	for (uint16_t x = 0; x < plyrNo_; x++)
 	{
 		for (uint32_t y = 0; y < gameNo_; y++)
 		{				
