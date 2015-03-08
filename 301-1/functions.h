@@ -3,21 +3,13 @@
 
 #include <iostream>
 #include <string>
-#include <windows.h>
 #include <conio.h>
+#include <cstdint>
 
-#include "darts.h"
+#include "globals.h"
 
-const uint16_t Y_POS_DEFAULT = 14; // cursor y position
-const uint16_t X_POS_DEFAULT = 29; // cursor x position
-static uint16_t yPos = Y_POS_DEFAULT; // menu cursor y position
-static uint16_t xPos = X_POS_DEFAULT; // menu cursor x position
-
-Darts dartsGame;
-
-CONSOLE_CURSOR_INFO curInfo;
-HANDLE hConsole;
-COORD cursorPos;
+const uint16_t X_POS_DEFAULT = 29;
+const uint16_t Y_POS_DEFAULT = 14;
 
 void setGraphics();
 void drawString(uint16_t x,uint16_t y, std::string out);

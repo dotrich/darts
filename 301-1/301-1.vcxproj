@@ -76,11 +76,13 @@
   <ItemGroup>
     <ClCompile Include="darts.cpp" />
     <ClCompile Include="functions.cpp" />
+    <ClCompile Include="globals.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="darts.h" />
     <ClInclude Include="functions.h" />
+    <ClInclude Include="globals.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

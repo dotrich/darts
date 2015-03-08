@@ -13,7 +13,7 @@ void setGraphics()
 	curInfo.dwSize = 100;
 	curInfo.bVisible = 0;
 	SetConsoleCursorInfo(hConsole, &curInfo); // sets once finished
-}
+};
 
 void drawString(uint16_t x,uint16_t y, string out)
 {
@@ -23,7 +23,7 @@ void drawString(uint16_t x,uint16_t y, string out)
 
 	if (out != "") // allows only cursor changing if no string entered
 		cout << out;
-}
+};
 
 void clampCurDraw(char axis, uint16_t no, uint16_t max)
 {
@@ -46,14 +46,14 @@ void clampCurDraw(char axis, uint16_t no, uint16_t max)
 		drawString(4, yPos, "["); // adds new cursor
 		drawString(6, yPos, "]");
 	}
-}
+};
 
 void updateSettings() // refreshes settings on game settings screen
 {
 	drawString(29, 15, std::to_string((long long unsigned)dartsGame.getNoPlayers() ));
 	drawString(29, 16, std::to_string((long long unsigned)dartsGame.getScore() ));
 	drawString(29, 17, std::to_string((long long unsigned)dartsGame.getNoGames() ));
-}
+};
 
 int16_t intLength(int64_t var)
 {
@@ -66,7 +66,7 @@ int16_t intLength(int64_t var)
 	}
 
 	return len;
-}
+};
 
 uint32_t intModifier(uint16_t input, uint16_t xPos, uint32_t var)
 {
@@ -91,7 +91,7 @@ uint32_t intModifier(uint16_t input, uint16_t xPos, uint32_t var)
 	decNo = decNo * (modNo / 10); // old value for swapping out
 	
 	return (var - decNo) + incNo; // swaps
-}
+};
 
 /*// unused code
 
@@ -104,3 +104,38 @@ uint32_t intModifier(uint16_t input, uint16_t xPos, uint32_t var)
 //
 //FuncPointer scrnArray[4] = {nullptr};
 //scrnArray[0] = &scrnMenu;*/
+
+//WNDPROC pOriginalWindowProc = nullptr;
+//HWND hWindow = GetConsoleWindow();
+
+//LRESULT APIENTRY CommandProc(
+//	HWND hwnd, 
+//	UINT uMsg, 
+//	WPARAM wParam, 
+//	LPARAM lParam)
+//{
+//	if (wParam == 13)
+//	{
+//		switch (uMsg)
+//		{
+//			case WM_KEYDOWN :
+//				cout << "TURKEY" << "\n";
+//				break;
+//			case WM_KEYUP :
+//				cout << "BUTTS" << "\n";
+//				break;
+//		}
+//	}
+//
+//	return CallWindowProc(pOriginalWindowProc, hwnd, uMsg, wParam, lParam); 
+//};
+
+//pOriginalWindowProc = (WNDPROC)SetWindowLong(hWindow, GWL_WNDPROC, (LONG)CommandProc);
+//MSG msg;
+//cout << "Console Val: " << (int)hWindow << "\n";
+//
+//while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0)
+//{
+//	TranslateMessage(&msg);
+//	DispatchMessage(&msg);
+//}
