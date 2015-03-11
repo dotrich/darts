@@ -2,9 +2,12 @@
 #define _GLOBALS_H
 
 #include <windows.h>
+
 #include "darts.h"
+#include "inputManager.h"
 
 extern Darts dartsGame;
+extern InputManager inputManager;
 
 extern CONSOLE_CURSOR_INFO curInfo;
 extern HANDLE hConsole;

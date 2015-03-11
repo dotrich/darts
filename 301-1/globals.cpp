@@ -2,6 +2,7 @@
 #include "functions.h"
 
 Darts dartsGame;
+InputManager inputManager;
 
 CONSOLE_CURSOR_INFO curInfo;
 HANDLE hConsole;
