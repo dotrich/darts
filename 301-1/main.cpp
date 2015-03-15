@@ -2,7 +2,7 @@
 using std::cout;
 
 // screens
-void scrnInit(uint16_t scrn);
+void scrnInit(uint16_t);
 void scrnMain();
 void scrnSettings();
 void scrnInfo();
@@ -26,14 +26,10 @@ funcPtr scrnMainCluster[6];
 funcPtr scrnInfoCluster[6];
 funcPtr scrnSettingsCluster[6];
 
-// MAIN
+// ENTRY POINT - PROGRAM
 void main()
 {
-	DWORD inRecRead;
-	INPUT_RECORD inBuffer[1]; // input buffer
-	KEY_EVENT_RECORD key;
-
-	HANDLE hStdIn = GetStdHandle(STD_INPUT_HANDLE); // input buffer handle
+	INPUT_RECORD key;
 
 	// CLUSTER SETUP
 	// scrnMain
@@ -64,22 +60,16 @@ void main()
 	setGraphics();
 	scrnInit(1);
 
-	// ENTRY POINT
+	// ENTRY POINT - GAME LOOP
 	do
 	{
-		ReadConsoleInput( 
-			hStdIn, // input buffer handle 
-			inBuffer, // buffer
-			1, // size of buffer
-			&inRecRead); // records read
-
-		key = inBuffer[0].Event.KeyEvent;
+		key = inputManager.getVkCode(); //inBuffer[0].Event.KeyEvent;
 		
-		if (inBuffer[0].EventType == KEY_EVENT)
+		if (key.EventType == KEY_EVENT)
 		{
-			if (key.bKeyDown == true)
+			if (key.Event.KeyEvent.bKeyDown == (BOOL)true)
 			{
-				input = inBuffer[0].Event.KeyEvent.wVirtualKeyCode;
+				input = key.Event.KeyEvent.wVirtualKeyCode;
 
 				switch(screen)
 				{
@@ -179,15 +169,14 @@ void scrnSettings() // game settings prior to playing
 
 	uint32_t curInt = 0;
 	uint32_t toBeInt = 0;
-	uint32_t minSize, maxSize;
+	uint32_t minSize = 1;
+	uint32_t maxSize = 1000;
 
 	// SETTING MODIFIERS
 	switch (yPos) // gets int of current y position
 	{
 		case Y_POS_DEFAULT + 1 :
 			curInt = dartsGame.getNoPlayers();
-			minSize = 1;
-			maxSize = 1000;
 			break;
 		case Y_POS_DEFAULT + 2 :
 			curInt = dartsGame.getScore();
@@ -196,49 +185,32 @@ void scrnSettings() // game settings prior to playing
 			break;
 		case Y_POS_DEFAULT + 3 :
 			curInt = dartsGame.getNoGames();
-			minSize = 1;
 			maxSize = 100000000;
 			break;
 	}
 
 	if (input == 46)
-	{
-		if (xPos - 29 == 0) // stops zero being added to front
-		{
-		}
-		else if ((xPos - 29) + 1 > intLength(curInt)) // if cursor has passed the length of current int
-		{
-		} 
-		else if ((xPos - 29) + 1 > 1 && (xPos - 29) + 1 <= intLength(curInt)) // inbetween digits
-			toBeInt = intModifier(input, xPos - 29, curInt);
-	}
+		toBeInt = intModifier(input, xPos - 29, curInt);
 	else if (input >= 48 && input <= 57) // number keys 0-9
 	{
-		if (input == 48 && (xPos - 29) == 0) ; // stops zero being added to front
-		else
-		{
-			toBeInt = intModifier(input, xPos - 29, curInt);
+		toBeInt = intModifier(input, xPos - 29, curInt);
 			
-			if ((xPos - 29) + 1 < intLength(curInt))
-				xPos++;
-		}
+		if (xPos >= X_POS_DEFAULT && xPos <= X_POS_DEFAULT + 9)
+			xPos++;
 	}
 
 	if ((input >= 48 && input <= 57) || input == 46)
 	{
 		if (toBeInt != 0)
-		{
-			if (toBeInt < minSize)
-				toBeInt = minSize;
-			else if (toBeInt > maxSize)
-				toBeInt = maxSize;
+		{		
+			toBeInt = clamp(toBeInt, minSize, maxSize);
 
 			// commits updated setting
-			if (curInt == dartsGame.getNoPlayers())
+			if (maxSize == 1000)
 				dartsGame.setNoPlayers(toBeInt);
-			else if (curInt == dartsGame.getScore())
+			else if (maxSize == 30001)
 				dartsGame.setScore(toBeInt);
-			else if (curInt == dartsGame.getNoGames())
+			else if (maxSize == 100000000)
 				dartsGame.setNoGames(toBeInt);
 
 			updateSettings();

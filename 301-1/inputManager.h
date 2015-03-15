@@ -11,9 +11,11 @@ class InputManager
 		INPUT_RECORD* inBuffer; // input buffer
 		uint16_t keyVk; // vk code of last key event
 	public:
-		uint16_t getVkCode(); // gets last pressed key
+		INPUT_RECORD getVkCode(); // gets key record of last key pressed
+		~InputManager();
 
 		void inputMenu(funcPtr ptrFuncArray[6]); // simulates menu with passed function array
+
 };
 
 #endif

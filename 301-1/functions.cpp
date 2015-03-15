@@ -4,6 +4,15 @@ using std::string;
 using std::cout;
 using std::cin;
 
+void setGraphics();
+
+void drawString(uint16_t,uint16_t, string);
+void clampCurDraw(char, uint16_t, uint16_t);
+void updateSettings();
+
+int16_t intLength(int64_t var);
+uint32_t intModifier(uint16_t, uint16_t, uint32_t);
+
 void setGraphics()
 {
 	hConsole = GetStdHandle(STD_OUTPUT_HANDLE); // used to reference console
@@ -76,6 +85,8 @@ uint32_t intModifier(uint16_t input, uint16_t xPos, uint32_t var) // uses decima
 	uint32_t modNo, modResult;
 	uint16_t len = intLength(var);
 
+	uint16_t xPosOct = xPos + 1;
+
 	for (uint16_t x = 48; x <= 57; x++) // converts vkcodes 48-57 input into equivelent decimal 0-9
 	{
 		if (x == input)
@@ -87,11 +98,11 @@ uint32_t intModifier(uint16_t input, uint16_t xPos, uint32_t var) // uses decima
 
 	if (input == 46) // delete
 	{
-		if (xPos == len) // last digit
-		{
+		if (xPosOct > len) ;
+			// do nothing
+		else if (xPosOct == len) // last digit
 			return (uint32_t)(var / 10);
-		}
-		else if (xPos <= len) // all digits inbetween
+		else if (xPosOct > 1 && xPosOct < len) // all digits inbetween
 		{
 			/* example:
 			9876 starting no
@@ -101,77 +112,35 @@ uint32_t intModifier(uint16_t input, uint16_t xPos, uint32_t var) // uses decima
 			modResult = var % modNo; // uses modNo, equals 876
 			decNo = (var - modResult) / 10; // takes 876 from starting no, divides by 10, equals 900
 
-			modNo = pow((float)10, len - (xPos + 1)); // gets modulo for 76
+			modNo = pow((float)10, len - xPosOct); // gets modulo for 76
 			modResult = var % modNo; // uses modNo, equals 76
 			incNo = decNo + modResult; // adds decNo and modResult, equals 976, 8 has been removed
 
 			return incNo;
 		}
+		else if (xPosOct == 1) ; // dont delete first digit
+			// do nothing
 	}
-	else if (input == 48 && xPos >= len)
+	else if (input >= 48 && input <= 57)
 	{
-		return (uint32_t)(var * 10); // adding zero to end
-	}
-	else if (input >= 49 && input <= 57 && xPos >= len)
-	{
-		return (uint32_t)((var * 10) + incNo);
-	}
-	else // modifying digit
-	{
-		modNo = pow((float)10, len - xPos); // division number for modulo
-		decNo = (var % modNo) / pow((float)10, len - (xPos + 1)); // gets decrement digit
+		if (xPosOct >= 1 && xPosOct <= len) // all digits
+		{
+			if (xPosOct == 1 && input == 48) ; // stop 0 being added to front
+				// do nothing
+			else
+			{
+				modNo = pow((float)10, len - xPos); // division number for modulo
+				decNo = (var % modNo) / pow((float)10, len - (xPos + 1)); // gets decrement digit
 
-		incNo = incNo * (modNo / 10); // new value for swapping in
-		decNo = decNo * (modNo / 10); // old value for swapping out
+				incNo = incNo * (modNo / 10); // new value for swapping in
+				decNo = decNo * (modNo / 10); // old value for swapping out
 	
-		return (var - decNo) + incNo; // swaps
+				return (var - decNo) + incNo; // swaps
+			}
+		}
+		else if (xPosOct > len)
+			return (uint32_t)((var * 10) + incNo);
 	}
+
+	return 0;
 };
-
-/*// unused code
-
-//#include <map>
-//std::map<char, uint16_t> POS_DEFAULT;
-//POS_DEFAULT[axis] = nullptr;
-
-// function pointer array
-//typedef void (*FuncPointer)(uint16_t, uint16_t);
-//
-//FuncPointer scrnArray[4] = {nullptr};
-//scrnArray[0] = &scrnMenu;*/
-
-// non-functional input hook
-//WNDPROC pOriginalWindowProc = nullptr;
-//HWND hWindow = GetConsoleWindow();
-
-//LRESULT APIENTRY CommandProc(
-//	HWND hwnd, 
-//	UINT uMsg, 
-//	WPARAM wParam, 
-//	LPARAM lParam)
-//{
-//	if (wParam == 13)
-//	{
-//		switch (uMsg)
-//		{
-//			case WM_KEYDOWN :
-//				cout << "TURKEY" << "\n";
-//				break;
-//			case WM_KEYUP :
-//				cout << "BUTTS" << "\n";
-//				break;
-//		}
-//	}
-//
-//	return CallWindowProc(pOriginalWindowProc, hwnd, uMsg, wParam, lParam); 
-//};
-
-//pOriginalWindowProc = (WNDPROC)SetWindowLong(hWindow, GWL_WNDPROC, (LONG)CommandProc);
-//MSG msg;
-//cout << "Console Val: " << (int)hWindow << "\n";
-//
-//while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE) > 0)
-//{
-//	TranslateMessage(&msg);
-//	DispatchMessage(&msg);
-//}

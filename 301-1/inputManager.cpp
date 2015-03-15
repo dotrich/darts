@@ -6,11 +6,16 @@
 
 HANDLE hStdIn;
 
-uint16_t InputManager::getVkCode() // supports keyboard events only, for now
+InputManager::~InputManager()
 {
-	DWORD inRecRead, i;
+	delete [] inBuffer;
+	inBuffer = nullptr;
+}
+
+INPUT_RECORD InputManager::getVkCode() // supports keyboard events only, for now
+{
+	DWORD inRecRead;
 	INPUT_RECORD inBuffer[1]; // input buffer
-	uint16_t input;
 
 	hStdIn = GetStdHandle(STD_INPUT_HANDLE); // input buffer handle
  
@@ -20,7 +25,7 @@ uint16_t InputManager::getVkCode() // supports keyboard events only, for now
         1, // size of buffer
         &inRecRead); // records read
 	
-	return inBuffer[0].Event.KeyEvent.wVirtualKeyCode;
+	return inBuffer[0]; //inBuffer[0].Event.KeyEvent.wVirtualKeyCode;
 };
 
 void InputManager::inputMenu(funcPtr ptrFuncArray[6])
